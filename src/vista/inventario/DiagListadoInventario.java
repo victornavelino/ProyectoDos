@@ -471,8 +471,8 @@ public class DiagListadoInventario extends javax.swing.JDialog {
 
     private void nuevoInventario() {
         //
-        FrInventario frInventario = new FrInventario(usuario, sucursal,"Alta");
-        //frInventario.setLocation(Comunes.centrarFrame(frInventario));
-        frInventario.setVisible(true);
+        DiagInventario diagInventario= new DiagInventario(null, true, usuario, sucursal, "Alta");
+        diagInventario.setLocation(Comunes.centrarDialog(diagInventario));
+        diagInventario.setVisible(true);
     }
 }
