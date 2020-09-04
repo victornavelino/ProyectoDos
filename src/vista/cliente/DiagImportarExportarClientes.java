@@ -11,6 +11,7 @@ import entidades.cliente.Organismo;
 import entidades.cliente.Persona;
 import entidades.persona.CorreoElectronico;
 import entidades.persona.DocumentoIdentidad;
+import entidades.persona.Domicilio;
 import entidades.persona.Sexo;
 import entidades.persona.Telefono;
 import entidades.persona.TipoDocumento;
@@ -157,34 +158,33 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 544, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 713, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(btnImportarClientes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnExportarClientes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnExportarClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(280, 280, 280)
+                        .addGap(336, 336, 336)
                         .addComponent(btnGuardarListaClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(50, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(59, 59, 59)
-                        .addComponent(btnImportarClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnExportarClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(7, 7, 7)
-                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(33, 33, 33)
+                .addComponent(btnImportarClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnExportarClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(7, 7, 7)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(126, Short.MAX_VALUE))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(btnGuardarListaClientes)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(DiagImportarExportarClientes.class, "DiagImportarExportarClientes.jPanel2.TabConstraints.tabTitle"), jPanel2); // NOI18N
@@ -428,6 +428,7 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
             columnasNoEditables.add(7);
             columnasNoEditables.add(8);
             columnasNoEditables.add(9);
+            columnasNoEditables.add(10);
             ModeloTablaNoEditable model = new ModeloTablaNoEditable(data, headers, columnasNoEditables);
             tblClientes.setModel(model);
         }
@@ -493,6 +494,7 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
         columnasNoEditables.add(7);
         columnasNoEditables.add(8);
         columnasNoEditables.add(9);
+        columnasNoEditables.add(10);
         modeloTablaClientes = new ModeloTablaNoEditable(columnasNoEditables);
         cargarEncabezadosTabla(modeloTablaClientes);
     }
@@ -520,6 +522,7 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
         modeloTablaClientes.addColumn("Fidelizado");
         modeloTablaClientes.addColumn("Correo");
         modeloTablaClientes.addColumn("Telefono");
+        modeloTablaClientes.addColumn("Domicilio");
         tblClientes.setModel(modeloTablaClientes);
     }
 
@@ -560,29 +563,32 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
             //fila[numeroFila++] = "";
         }
         try {
-            if(persona.isFidelizado()){
+            if (persona.isFidelizado()) {
                 fila[numeroFila++] = "SI";
-            }else{
-               fila[numeroFila++] = "NO"; 
+            } else {
+                fila[numeroFila++] = "NO";
             }
-            
+
         } catch (Exception e) {
             //fila[numeroFila++] = "";
         }
-     //   if (!persona.getCorreosElectronicos().isEmpty()) {
-            try {
-                fila[numeroFila++] = persona.getCorreosElectronicos().get(0).getDireccion();
-            } catch (Exception e) {
-                //fila[numeroFila++] = "";
-            }
-    //    }
-    //    if (!persona.getTelefonos().isEmpty()) {
-            try {
-                fila[numeroFila++] = persona.getTelefonos().get(0).getNumero();
-            } catch (Exception e) {
-                //fila[numeroFila++] = "";
-            }
-     //   }
+        try {
+            fila[numeroFila++] = persona.getCorreosElectronicos().get(0).getDireccion();
+        } catch (Exception e) {
+            //fila[numeroFila++] = "";
+        }
+
+        try {
+            fila[numeroFila++] = persona.getTelefonos().get(0).getNumero();
+        } catch (Exception e) {
+            //fila[numeroFila++] = "";
+        }
+
+        try {
+            fila[numeroFila++] = persona.getDomicilio().getCalle();
+        } catch (Exception e) {
+            //fila[numeroFila++] = "";
+        }
 
         modeloTablaClientes.addRow(fila);
     }
@@ -631,6 +637,7 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
 
                 if (!ClienteFacade.getInstance().getPersonaDni(tblClientes.getValueAt(i, 3).toString())) {
                     System.out.println("entroooooo");
+                    Domicilio domicilio;
                     CorreoElectronico mail;
                     Telefono telefono;
                     List<CorreoElectronico> correosElectronicos;
@@ -721,12 +728,21 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
                             persona.setTelefonos(telefonos);
                         } catch (Exception e) {
                         }
-
+                    }
+                    //DOMICILIO
+                    if (!tblClientes.getValueAt(i, 10).toString().isEmpty()) {
+                        try {
+                            domicilio = new Domicilio();
+                            domicilio.setCalle(tblClientes.getValueAt(i, 10).toString());
+                            persona.setDomicilio(domicilio);
+                        } catch (Exception e) {
+                        }
                     }
 
                     ClienteFacade.getInstance().alta(persona);
 
                 } else {
+                    Domicilio domicilio;
                     CorreoElectronico mail;
                     Telefono telefono;
                     List<CorreoElectronico> correosElectronicos;
@@ -817,7 +833,15 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
                             persona.setTelefonos(telefonos);
                         } catch (Exception e) {
                         }
-
+                    }
+                                        //DOMICILIO
+                    if (!tblClientes.getValueAt(i, 10).toString().isEmpty()) {
+                        try {
+                            domicilio = new Domicilio();
+                            domicilio.setCalle(tblClientes.getValueAt(i, 10).toString());
+                            persona.setDomicilio(domicilio);
+                        } catch (Exception e) {
+                        }
                     }
 
                     ClienteFacade.getInstance().modificar(persona);
