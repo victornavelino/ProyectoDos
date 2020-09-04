@@ -9,7 +9,9 @@ import entidades.articulo.ListaPrecio;
 import entidades.cliente.Cliente;
 import entidades.cliente.Organismo;
 import entidades.cliente.Persona;
+import entidades.persona.CorreoElectronico;
 import entidades.persona.DocumentoIdentidad;
+import entidades.persona.Sexo;
 import entidades.persona.Telefono;
 import entidades.persona.TipoDocumento;
 import entidades.persona.TipoTelefono;
@@ -18,12 +20,14 @@ import facade.ListaPrecioFacade;
 import facade.TelefonoFacade;
 import facade.TipoDocumentoFacade;
 import facade.TipoTelefonoFacade;
+import includes.Comunes;
 import includes.ExportarExcel;
 import includes.ModeloTablaNoEditable;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
@@ -420,6 +424,10 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
             columnasNoEditables.add(3);
             columnasNoEditables.add(4);
             columnasNoEditables.add(5);
+            columnasNoEditables.add(6);
+            columnasNoEditables.add(7);
+            columnasNoEditables.add(8);
+            columnasNoEditables.add(9);
             ModeloTablaNoEditable model = new ModeloTablaNoEditable(data, headers, columnasNoEditables);
             tblClientes.setModel(model);
         }
@@ -481,6 +489,10 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
         columnasNoEditables.add(3);
         columnasNoEditables.add(4);
         columnasNoEditables.add(5);
+        columnasNoEditables.add(6);
+        columnasNoEditables.add(7);
+        columnasNoEditables.add(8);
+        columnasNoEditables.add(9);
         modeloTablaClientes = new ModeloTablaNoEditable(columnasNoEditables);
         cargarEncabezadosTabla(modeloTablaClientes);
     }
@@ -504,6 +516,10 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
         modeloTablaClientes.addColumn("Nro Dni");
         modeloTablaClientes.addColumn("Fecha Nacimiento");
         modeloTablaClientes.addColumn("Lista de Precio");
+        modeloTablaClientes.addColumn("Sexo");
+        modeloTablaClientes.addColumn("Fidelizado");
+        modeloTablaClientes.addColumn("Correo");
+        modeloTablaClientes.addColumn("Telefono");
         tblClientes.setModel(modeloTablaClientes);
     }
 
@@ -538,6 +554,35 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
         } catch (Exception e) {
             //fila[numeroFila++] = "";
         }
+        try {
+            fila[numeroFila++] = persona.getSexo().toString();
+        } catch (Exception e) {
+            //fila[numeroFila++] = "";
+        }
+        try {
+            if(persona.isFidelizado()){
+                fila[numeroFila++] = "SI";
+            }else{
+               fila[numeroFila++] = "NO"; 
+            }
+            
+        } catch (Exception e) {
+            //fila[numeroFila++] = "";
+        }
+     //   if (!persona.getCorreosElectronicos().isEmpty()) {
+            try {
+                fila[numeroFila++] = persona.getCorreosElectronicos().get(0).getDireccion();
+            } catch (Exception e) {
+                //fila[numeroFila++] = "";
+            }
+    //    }
+    //    if (!persona.getTelefonos().isEmpty()) {
+            try {
+                fila[numeroFila++] = persona.getTelefonos().get(0).getNumero();
+            } catch (Exception e) {
+                //fila[numeroFila++] = "";
+            }
+     //   }
 
         modeloTablaClientes.addRow(fila);
     }
@@ -586,7 +631,10 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
 
                 if (!ClienteFacade.getInstance().getPersonaDni(tblClientes.getValueAt(i, 3).toString())) {
                     System.out.println("entroooooo");
-
+                    CorreoElectronico mail;
+                    Telefono telefono;
+                    List<CorreoElectronico> correosElectronicos;
+                    List<Telefono> telefonos;
                     persona = new Persona();
                     documento = new DocumentoIdentidad();
                     tipoDoc = new TipoDocumento();
@@ -630,10 +678,59 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
 //                        }
 
                     }
+                    //SEXO
+                    try {
+                        if (tblClientes.getValueAt(i, 6).toString().contains("FEMENINO")) {
+                            persona.setSexo(Sexo.FEMENINO);
+                        } else {
+                            persona.setSexo(Sexo.MASCULINO);
+                        }
+
+                    } catch (Exception e) {
+                    }
+                    //FIDELIZADO
+                    try {
+                        if (tblClientes.getValueAt(i, 7).toString().contains("SI")) {
+                            persona.setFidelizado(Boolean.TRUE);
+                        } else {
+                            persona.setFidelizado(Boolean.FALSE);
+                        }
+                    } catch (Exception e) {
+                    }
+                    //CORREO
+                    if (!tblClientes.getValueAt(i, 8).toString().isEmpty()) {
+                        if (Comunes.validarEmail(tblClientes.getValueAt(i, 8).toString())) {
+                            try {
+                                mail = new CorreoElectronico();
+                                mail.setDireccion(tblClientes.getValueAt(i, 8).toString());
+                                correosElectronicos = new ArrayList<>();
+                                correosElectronicos.add(mail);
+                                persona.setCorreosElectronicos(correosElectronicos);
+                            } catch (Exception e) {
+                            }
+                        }
+                    }
+                    //TELEFONO
+                    if (!tblClientes.getValueAt(i, 9).toString().isEmpty()) {
+                        try {
+                            telefono = new Telefono();
+                            telefono.setTipoTelefono(TipoTelefonoFacade.getInstance().buscar(1L));
+                            telefono.setNumero(tblClientes.getValueAt(i, 9).toString());
+                            telefonos = new ArrayList<>();
+                            telefonos.add(telefono);
+                            persona.setTelefonos(telefonos);
+                        } catch (Exception e) {
+                        }
+
+                    }
 
                     ClienteFacade.getInstance().alta(persona);
 
                 } else {
+                    CorreoElectronico mail;
+                    Telefono telefono;
+                    List<CorreoElectronico> correosElectronicos;
+                    List<Telefono> telefonos;
                     documento = new DocumentoIdentidad();
                     tipoDoc = new TipoDocumento();
                     persona = ClienteFacade.getInstance().getPersonaXDni(tblClientes.getValueAt(i, 3).toString());
@@ -675,6 +772,51 @@ public class DiagImportarExportarClientes extends javax.swing.JDialog {
 //                                    + "en el archivo excel");
 //                            throw new Exception();
 //                        }
+
+                    }
+                    //SEXO
+                    try {
+                        if (tblClientes.getValueAt(i, 6).toString().contains("FEMENINO")) {
+                            persona.setSexo(Sexo.FEMENINO);
+                        } else {
+                            persona.setSexo(Sexo.MASCULINO);
+                        }
+
+                    } catch (Exception e) {
+                    }
+                    //FIDELIZADO
+                    try {
+                        if (tblClientes.getValueAt(i, 7).toString().contains("SI")) {
+                            persona.setFidelizado(Boolean.TRUE);
+                        } else {
+                            persona.setFidelizado(Boolean.FALSE);
+                        }
+                    } catch (Exception e) {
+                    }
+                    //CORREO
+                    if (!tblClientes.getValueAt(i, 8).toString().isEmpty()) {
+                        if (Comunes.validarEmail(tblClientes.getValueAt(i, 8).toString())) {
+                            try {
+                                mail = new CorreoElectronico();
+                                mail.setDireccion(tblClientes.getValueAt(i, 8).toString());
+                                correosElectronicos = new ArrayList<>();
+                                correosElectronicos.add(mail);
+                                persona.setCorreosElectronicos(correosElectronicos);
+                            } catch (Exception e) {
+                            }
+                        }
+                    }
+                    //TELEFONO
+                    if (!tblClientes.getValueAt(i, 9).toString().isEmpty()) {
+                        try {
+                            telefono = new Telefono();
+                            telefono.setTipoTelefono(TipoTelefonoFacade.getInstance().buscar(1L));
+                            telefono.setNumero(tblClientes.getValueAt(i, 9).toString());
+                            telefonos = new ArrayList<>();
+                            telefonos.add(telefono);
+                            persona.setTelefonos(telefonos);
+                        } catch (Exception e) {
+                        }
 
                     }
 
