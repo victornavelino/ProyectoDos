@@ -5,6 +5,7 @@
  */
 package vista.Caja;
 
+import Recursos.SoapNoEnviados;
 import entidades.caja.Caja;
 import entidades.caja.CuentaCorriente;
 import entidades.caja.CuponTarjeta;
@@ -533,6 +534,7 @@ public class DiagResumenCierreCaja extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
+        ReintentarEnviarVentasFidelizadasConError();
         this.cerrarCaja = true;
         this.caja.setCajaFinal(new BigDecimal(tfSaldoDeCajaReal.getText()));
         this.dispose();
@@ -678,12 +680,12 @@ public class DiagResumenCierreCaja extends javax.swing.JDialog {
             // YA QUE ESTAS ULTIMAS NO REPRESENTAN INGRESO DE CAJA
             BigDecimal cuponesCtaCteConTarjeta = new BigDecimal("0.000");
             BigDecimal cobranzaCtaCteConTarjeta;
-            for(CuponTarjeta cupon:CuponTarjetaFacade.getInstance().getCuponesTarjetaCtaCteCaja(caja.getFechaInicio())){
-                cuponesCtaCteConTarjeta=cuponesCtaCteConTarjeta.add(cupon.getImporteCuponConRecargo());
+            for (CuponTarjeta cupon : CuponTarjetaFacade.getInstance().getCuponesTarjetaCtaCteCaja(caja.getFechaInicio())) {
+                cuponesCtaCteConTarjeta = cuponesCtaCteConTarjeta.add(cupon.getImporteCuponConRecargo());
             }
-            cobranzaCtaCteConTarjeta=CajaFacade.getInstance().getCobranazaCtaCteCaja(caja);
-            cobranzaCtaCteConTarjeta=cobranzaCtaCteConTarjeta.subtract(cuponesCtaCteConTarjeta);
-            
+            cobranzaCtaCteConTarjeta = CajaFacade.getInstance().getCobranazaCtaCteCaja(caja);
+            cobranzaCtaCteConTarjeta = cobranzaCtaCteConTarjeta.subtract(cuponesCtaCteConTarjeta);
+
             tfCobranzasCtaCte.setText(new DecimalFormat("0.000").format(cobranzaCtaCteConTarjeta));
         } catch (Exception e) {
         }
@@ -793,5 +795,12 @@ public class DiagResumenCierreCaja extends javax.swing.JDialog {
         } else {
             tfDiferenciaCaja.setText("");
         }
+    }
+
+    private void ReintentarEnviarVentasFidelizadasConError() {
+        //To change body of generated methods, choose Tools | Templates.
+        Runnable run = new SoapNoEnviados();
+        Thread thread = new Thread(run);
+        thread.start();
     }
 }
