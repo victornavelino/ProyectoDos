@@ -5,6 +5,8 @@
  */
 package facade;
 
+import Recursos.Soap;
+import Recursos.SoapNoEnviados;
 import controladores.CajaJpaController;
 import entidades.Sucursal;
 import entidades.caja.Caja;
@@ -98,6 +100,8 @@ public class CajaFacade {
 //    }
 //esto se ejecuta siempre que logues con un usuario de caja
     public void abrirCaja(Usuario usuario, Sucursal sucursal) {
+        //ENVIAR VENTAS NO FIDELIZADAS
+        ReintentarEnviarVentasFidelizadasConError();
         // SI ES DISTINTO DIA, tiene que cerrar el turno 
         if (hayCajaAbierta(sucursal)) {
             Caja cAbierta = getCajaAbierta(sucursal);
@@ -679,6 +683,12 @@ public class CajaFacade {
         quBuscar.setParameter("fechaFin", fechaFin);
 
         return quBuscar.getResultList();
+    }
+
+    private void ReintentarEnviarVentasFidelizadasConError() {
+        Runnable run = new SoapNoEnviados();
+        Thread thread = new Thread(run);
+        thread.start();
     }
 
 }

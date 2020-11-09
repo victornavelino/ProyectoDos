@@ -12,6 +12,8 @@ import includes.Comunes;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
@@ -22,21 +24,18 @@ import org.apache.commons.httpclient.methods.RequestEntity;
  *
  * @author hugo
  */
-public class Soap implements Runnable {
+public class SoapNoEnviados implements Runnable {
 
-    private final String cadena;
-    private final CobroVenta cobroVenta;
+    
+    private List<FidelizadoNoEnviado> fidelizadoNoEnviados = new ArrayList<>();
 
-
-
-    public Soap(String cadena, CobroVenta cobroVenta) {
-        this.cadena = cadena;
-        this.cobroVenta=cobroVenta;
+    public SoapNoEnviados() {
+        fidelizadoNoEnviados=FidelizadoNoEnviadoFacade.getInstance().buscarNoEnviados();
     }
 
     @Override
     public void run() {
-
+for(FidelizadoNoEnviado fidelizadoNoEnviado:fidelizadoNoEnviados){
         try {
 
             // Get target URL
@@ -48,7 +47,7 @@ public class Soap implements Runnable {
                     + "   <soapenv:Header/>\n"
                     + "   <soapenv:Body>\n"
                     + "      <web:ingreso soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"
-                    + "         <cadena xsi:type=\"xsd:string\">" + cadena + "</cadena>\n"
+                    + "         <cadena xsi:type=\"xsd:string\">" + fidelizadoNoEnviado.getCadena() + "</cadena>\n"
                     + "      </web:ingreso>\n"
                     + "   </soapenv:Body>\n"
                     + "</soapenv:Envelope>";
@@ -78,23 +77,21 @@ public class Soap implements Runnable {
                 // Display response
                 System.out.println("Response body: ");
                 System.out.println(post.getResponseBodyAsString());
-                
+
             } finally {
                 // Release current connection to the connection pool once you are done
                 post.releaseConnection();
+                //COMO YA SE SE CONECTO AL SERVER DE SOMOSMAS.CLUB
+                //SE CAMBIA EL ESTADO DEL CLIENTE
+                fidelizadoNoEnviado.setEnviado(Boolean.TRUE);
+                FidelizadoNoEnviadoFacade.getInstance().modificar(fidelizadoNoEnviado);
+                System.out.println("ENVIADO: " + fidelizadoNoEnviado.getCadena());
             }
 
         } catch (Exception e) {
-            //AGREGAR AQUI EL METODO PARA INSERTAR REGISTROS EN TABLA DE NO ENVIADOS
-            //QUE NO SE SINCRONIZARON
-            FidelizadoNoEnviado fidelizadoNoEnviado= new FidelizadoNoEnviado();
-            fidelizadoNoEnviado.setCadena(cadena);
-            fidelizadoNoEnviado.setCobroVenta(cobroVenta);
-            fidelizadoNoEnviado.setFecha(Comunes.obtenerFechaActualDesdeDB());
-            fidelizadoNoEnviado.setEnviado(Boolean.FALSE);
-            FidelizadoNoEnviadoFacade.getInstance().alta(fidelizadoNoEnviado);
+            
             System.out.println("Error Conectado a la base de datos" + e);
         }
-
+    }
     }
 }
