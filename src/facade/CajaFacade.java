@@ -181,6 +181,7 @@ public class CajaFacade {
     }
 
     public void cerrarCaja(Sucursal sucursal, Usuario usuario) {
+        ReintentarEnviarVentasFidelizadasConError();
         if (hayCajaAbierta(sucursal, usuario)) {
             int cantidadVentasSinCobrar = VentaFacade.getInstance().cantidadVentasSinCobrarCajaActual(sucursal, getCajaAbierta(sucursal, usuario));
             if (cantidadVentasSinCobrar == 0) {

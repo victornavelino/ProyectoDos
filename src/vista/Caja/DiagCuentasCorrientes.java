@@ -1276,7 +1276,7 @@ public class DiagCuentasCorrientes extends javax.swing.JDialog {
                             seleccionarCliente();
                             JOptionPane.showMessageDialog(null, "Registro eliminado");
                         } catch (Exception e) {
-                            JOptionPane.showMessageDialog(null, "No se pudo borrar la caja");
+                            JOptionPane.showMessageDialog(null, "No se pudo borrar, el Registro esta relacionado con el listado en la caja");
                         }
 
                     } else {
