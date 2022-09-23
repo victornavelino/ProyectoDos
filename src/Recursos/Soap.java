@@ -40,11 +40,11 @@ public class Soap implements Runnable {
         try {
 
             // Get target URL
-            String strURL = "http://somosmas.club/Webservice/wsvac.php?wsdl";
+            String strURL = "https://somosmas.club/Webservice/wsvac.php?wsdl";
             // Get SOAP action
             String strSoapAction = "consulta";
             // Get file to be posted
-            String strXMLFilename = "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://somosmas.club/Webservice/\">\n"
+            String strXMLFilename = "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"https://somosmas.club/Webservice/\">\n"
                     + "   <soapenv:Header/>\n"
                     + "   <soapenv:Body>\n"
                     + "      <web:ingreso soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n"

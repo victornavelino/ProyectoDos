@@ -934,7 +934,7 @@ public class Impresora {
             pagina.dispose();
             pj.end();
         } catch (Exception e) {
-            System.out.println("LA IMPRESION HA SIDO CANCELADA..." + e);
+            System.out.println("LA IMPRESION HA SIDO CANCELADA...." + e);
         }
 
     }
