@@ -25,13 +25,14 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 public class Soap implements Runnable {
 
     private final String cadena;
+    private final String tipoOperacion;
     private final CobroVenta cobroVenta;
 
-
-
-    public Soap(String cadena, CobroVenta cobroVenta) {
+    public Soap(String cadena, CobroVenta cobroVenta, String tipoOperacion) {
         this.cadena = cadena;
-        this.cobroVenta=cobroVenta;
+        this.cobroVenta = cobroVenta;
+        this.tipoOperacion = tipoOperacion;
+
     }
 
     @Override
@@ -78,7 +79,9 @@ public class Soap implements Runnable {
                 // Display response
                 System.out.println("Response body: ");
                 System.out.println(post.getResponseBodyAsString());
-                
+                if (tipoOperacion.equals("Reenvio")) {
+                    //FidelizadoNoEnviadoFacade.getInstance().buscar(Long.MIN_VALUE)
+                }
             } finally {
                 // Release current connection to the connection pool once you are done
                 post.releaseConnection();
@@ -87,13 +90,16 @@ public class Soap implements Runnable {
         } catch (Exception e) {
             //AGREGAR AQUI EL METODO PARA INSERTAR REGISTROS EN TABLA DE NO ENVIADOS
             //QUE NO SE SINCRONIZARON
-            FidelizadoNoEnviado fidelizadoNoEnviado= new FidelizadoNoEnviado();
-            fidelizadoNoEnviado.setCadena(cadena);
-            fidelizadoNoEnviado.setCobroVenta(cobroVenta);
-            fidelizadoNoEnviado.setFecha(Comunes.obtenerFechaActualDesdeDB());
-            fidelizadoNoEnviado.setEnviado(Boolean.FALSE);
-            FidelizadoNoEnviadoFacade.getInstance().alta(fidelizadoNoEnviado);
-            System.out.println("Error Conectado a la base de datos" + e);
+            if (tipoOperacion.equals("Alta")) {
+                FidelizadoNoEnviado fidelizadoNoEnviado = new FidelizadoNoEnviado();
+                fidelizadoNoEnviado.setCadena(cadena);
+                fidelizadoNoEnviado.setCobroVenta(cobroVenta);
+                fidelizadoNoEnviado.setFecha(Comunes.obtenerFechaActualDesdeDB());
+                fidelizadoNoEnviado.setEnviado(Boolean.FALSE);
+                FidelizadoNoEnviadoFacade.getInstance().alta(fidelizadoNoEnviado);
+                System.out.println("Error Conectado a la base de datos" + e);
+            }
+
         }
 
     }

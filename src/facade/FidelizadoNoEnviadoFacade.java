@@ -59,6 +59,10 @@ public class FidelizadoNoEnviadoFacade {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProyectoDosPU", ConexionFacade.PROPIEDADES);
         return new FidelizadoNoEnviadoJpaController(emf).findFidelizadoNoEnviado(id);
     }
+    public FidelizadoNoEnviado buscarXCobroVenta(Long id) {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProyectoDosPU", ConexionFacade.PROPIEDADES);
+        return new FidelizadoNoEnviadoJpaController(emf).findFidelizadoNoEnviado(id);
+    }
 
     public void modificar(FidelizadoNoEnviado fidelizadoNoEnviado) {
         try {

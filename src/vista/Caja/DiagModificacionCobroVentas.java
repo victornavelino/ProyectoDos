@@ -433,7 +433,7 @@ public class DiagModificacionCobroVentas extends javax.swing.JDialog {
         //String strCadena = "HGM678leR54G99FFjv|30207103|Franco Zurita Perea|3834811718|414141|francozurita@gmail.com|5000|0|1|0|Franco Zurita|'14/4/1983|Masc|5/9/2019|1";
         String cadena = new String();
         //System.out.println("CADENA: " + stringBuilder.toString());
-        Runnable r = new Soap(stringBuilder.toString(),cobroVenta);
+        Runnable r = new Soap(stringBuilder.toString(), cobroVenta, "Reenvio");
         Thread t = new Thread(r);
         t.start();
     }

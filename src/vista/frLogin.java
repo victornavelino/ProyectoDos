@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-/*
+ /*
  * frLogin.java
  *
  * Created on 03/11/2009, 19:48:30
@@ -11,10 +11,19 @@
 package vista;
 
 //import entidades.Usuarios;
+import Recursos.Soap;
+import entidades.caja.CobroVenta;
+import entidades.cliente.Persona;
+import entidades.fidelizacion.FidelizadoNoEnviado;
+import entidades.persona.Telefono;
 import entidades.usuario.Usuario;
+import facade.ClienteFacade;
+import facade.FidelizadoNoEnviadoFacade;
 import facade.UsuarioFacade;
 import includes.Comunes;
 import includes.SuperFrame;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
@@ -192,6 +201,179 @@ public class frLogin extends SuperFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new frLogin().setVisible(true);
+                enviarFidelizadosPendientes();
+            }
+
+            private void enviarFidelizadosPendientes() {
+                for (FidelizadoNoEnviado noEnviado : FidelizadoNoEnviadoFacade.getInstance().buscarNoEnviados()) {
+                    enviarVentaSOAP(noEnviado.getCobroVenta());
+                }
+                
+            }
+
+            private void enviarVentaSOAP(CobroVenta cobroVenta) {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("HGM678leR54G99FFjv");
+                stringBuilder.append("|");
+                //DNI
+                try {
+
+                    stringBuilder.append(Comunes.quitarPuntosDNI(cobroVenta.getVenta().getDniCliente()));
+                    stringBuilder.append("|");
+                } catch (Exception e) {
+                    stringBuilder.append("|");
+                }
+                //NOMBRE CLIENTE
+                try {
+                    stringBuilder.append(cobroVenta.getVenta().getCliente());
+                    stringBuilder.append("|");
+                } catch (Exception e) {
+                    stringBuilder.append("|");
+                }
+                //TELEFONOS
+                String celular = "0";
+                String fijo = "0";
+
+                if (!ClienteFacade.getInstance().getPersonaXDni(cobroVenta.getVenta().getDniCliente()).getTelefonos().isEmpty()) {
+                    List<Telefono> listaTelefonos = ClienteFacade.getInstance().getPersonaXDni(cobroVenta.getVenta().getDniCliente()).getTelefonos();
+                    for (Telefono telefono : listaTelefonos) {
+                        if (telefono.getTipoTelefono().getDescripcion().contains("CELULAR")) {
+                            celular = telefono.getNumero().trim();
+                        }
+                        if (telefono.getTipoTelefono().getDescripcion().contains("FIJO")) {
+                            fijo = telefono.getNumero().trim();
+                        }
+                    }
+                    //celular
+                    stringBuilder.append(celular);
+                    stringBuilder.append("|");
+                    //fijo
+                    stringBuilder.append(fijo);
+                    stringBuilder.append("|");
+
+                } else {
+                    //celular
+                    stringBuilder.append("0");
+                    stringBuilder.append("|");
+                    //fijo
+                    stringBuilder.append("0");
+                    stringBuilder.append("|");
+                }
+
+                //MAIL
+                try {
+                    if (!ClienteFacade.getInstance().getPersonaXDni(cobroVenta.getVenta().getDniCliente()).getCorreosElectronicos().isEmpty()) {
+                        stringBuilder.append(ClienteFacade.getInstance().getPersonaXDni(cobroVenta.getVenta().getDniCliente()).getCorreosElectronicos().get(0));
+                        stringBuilder.append("|");
+                    } else {
+                        //stringBuilder.append("nose@nose.com");
+                        stringBuilder.append("|");
+                    }
+
+                } catch (Exception e) {
+                    //stringBuilder.append("nose@nose.com");
+                    stringBuilder.append("|");
+                }
+                //MONTO
+                try {
+                    stringBuilder.append(cobroVenta.getVenta().getMonto());
+                    stringBuilder.append("|");
+                } catch (Exception e) {
+                    stringBuilder.append("0");
+                    stringBuilder.append("|");
+                }
+                //COMPROBANTE
+                try {
+                    stringBuilder.append(cobroVenta.getVenta().getNumeroTicket());
+                    stringBuilder.append("|");
+                } catch (Exception e) {
+                    stringBuilder.append("0");
+                    stringBuilder.append("|");
+                }
+                //sucursal
+                try {
+                    stringBuilder.append(cobroVenta.getVenta().getSucursal().getCodigo());
+                    stringBuilder.append("|");
+                } catch (Exception e) {
+                    stringBuilder.append("0");
+                    stringBuilder.append("|");
+                }
+                //ID VENDEDOR
+                try {
+                    stringBuilder.append(cobroVenta.getVenta().getUsuario().getId());
+                    stringBuilder.append("|");
+                } catch (Exception e) {
+                    stringBuilder.append("0");
+                    stringBuilder.append("|");
+                }
+                //NOMBRE VENDEDOR
+                try {
+                    stringBuilder.append(cobroVenta.getVenta().getUsuario().getNombreCompleto());
+                    stringBuilder.append("|");
+                } catch (Exception e) {
+                    stringBuilder.append("NN");
+                    stringBuilder.append("|");
+                }
+                //FECHA NAC CLIENTE
+                try {
+                    SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+                    if (ClienteFacade.getInstance().getPersonaXDni(cobroVenta.getVenta().getDniCliente()).getFechaNacimiento() != null) {
+                        stringBuilder.append(formatoFecha.format(ClienteFacade.getInstance().getPersonaXDni(cobroVenta.getVenta().getDniCliente()).getFechaNacimiento()));
+                        stringBuilder.append("|");
+                    } else {
+                        stringBuilder.append("01/01/2019");
+                        stringBuilder.append("|");
+                    }
+                } catch (Exception e) {
+                    stringBuilder.append("01/01/2019");
+                    stringBuilder.append("|");
+                }
+                //SEXO CLIENTE
+                try {
+                    if (ClienteFacade.getInstance().getPersonaXDni(cobroVenta.getVenta().getDniCliente()).getSexo() != null) {
+                        Persona persona = ClienteFacade.getInstance().getPersonaXDni(cobroVenta.getVenta().getDniCliente());
+                        if (persona.getSexo().getName().contains("MASCULINO")) {
+                            stringBuilder.append("M");
+                            stringBuilder.append("|");
+                        }
+                        if (persona.getSexo().getName().contains("FEMENINO")) {
+                            stringBuilder.append("F");
+                            stringBuilder.append("|");
+                        }
+                    } else {
+                        stringBuilder.append("N");
+                        stringBuilder.append("|");
+                        stringBuilder.append("N");
+                        stringBuilder.append("|");
+                    }
+                } catch (Exception e) {
+                    stringBuilder.append("N");
+                    stringBuilder.append("|");
+                    stringBuilder.append("N");
+                    stringBuilder.append("|");
+                }
+                //FECHA VENTA
+                try {
+                    SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+                    stringBuilder.append(formatoFecha.format(cobroVenta.getFecha()));
+                    stringBuilder.append("|");
+
+                } catch (Exception e) {
+                    stringBuilder.append("01/01/2019");
+                    stringBuilder.append("|");
+                }
+                //NUMERO DE SOCIO DNI
+                try {
+                    stringBuilder.append(cobroVenta.getVenta().getDniCliente());
+                } catch (Exception e) {
+
+                }
+                //String strCadena = "HGM678leR54G99FFjv|30207103|Franco Zurita Perea|3834811718|414141|francozurita@gmail.com|5000|0|1|0|Franco Zurita|'14/4/1983|Masc|5/9/2019|1";
+                String cadena = new String();
+                System.out.println("CADENA: " + stringBuilder.toString());
+                Runnable r = new Soap(stringBuilder.toString(), cobroVenta, "Reenvio");
+                Thread t = new Thread(r);
+                t.start();
             }
         });
     }
