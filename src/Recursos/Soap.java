@@ -80,7 +80,11 @@ public class Soap implements Runnable {
                 System.out.println("Response body: ");
                 System.out.println(post.getResponseBodyAsString());
                 if (tipoOperacion.equals("Reenvio")) {
-                    //FidelizadoNoEnviadoFacade.getInstance().buscar(Long.MIN_VALUE)
+                    System.out.println("Entro para borrar reenviado");
+                    FidelizadoNoEnviado fidelizadoNoEnviado = FidelizadoNoEnviadoFacade.getInstance().buscarXCobroVenta(cobroVenta);
+                    if (fidelizadoNoEnviado!=null) {
+                        FidelizadoNoEnviadoFacade.getInstance().eliminar(fidelizadoNoEnviado.getId());
+                    }
                 }
             } finally {
                 // Release current connection to the connection pool once you are done

@@ -8,6 +8,7 @@ package facade;
 import controladores.ClienteJpaController;
 import controladores.FidelizadoNoEnviadoJpaController;
 import controladores.exceptions.NonexistentEntityException;
+import entidades.caja.CobroVenta;
 import entidades.cliente.Cliente;
 import entidades.fidelizacion.FidelizadoNoEnviado;
 import java.util.List;
@@ -59,9 +60,16 @@ public class FidelizadoNoEnviadoFacade {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProyectoDosPU", ConexionFacade.PROPIEDADES);
         return new FidelizadoNoEnviadoJpaController(emf).findFidelizadoNoEnviado(id);
     }
-    public FidelizadoNoEnviado buscarXCobroVenta(Long id) {
+    public FidelizadoNoEnviado buscarXCobroVenta(CobroVenta cobroVenta) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProyectoDosPU", ConexionFacade.PROPIEDADES);
-        return new FidelizadoNoEnviadoJpaController(emf).findFidelizadoNoEnviado(id);
+        EntityManager ema = emf.createEntityManager();
+        Query q = ema.createQuery("SELECT f FROM FidelizadoNoEnviado f WHERE f.cobroVenta=:cobroVenta");
+        q.setParameter("cobroVenta", cobroVenta);
+        try {
+            return (FidelizadoNoEnviado)q.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public void modificar(FidelizadoNoEnviado fidelizadoNoEnviado) {
@@ -89,7 +97,7 @@ public class FidelizadoNoEnviadoFacade {
     public List<FidelizadoNoEnviado> buscarNoEnviados() {
         EntityManagerFactory emfa = Persistence.createEntityManagerFactory("ProyectoDosPU", ConexionFacade.PROPIEDADES);
         EntityManager ema = emfa.createEntityManager();
-        Query quBuscar = ema.createQuery("SELECT f FROM FidelizadoNoEnviado f where NOT f.enviado");
+        Query quBuscar = ema.createQuery("SELECT f FROM FidelizadoNoEnviado f");
         return quBuscar.getResultList();
     }
 
